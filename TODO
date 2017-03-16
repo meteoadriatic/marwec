@@ -1,0 +1,13 @@
+      Ideje za implementaciju, problemi i moguća rješenja
+---------------------------------------------------------------
+
+- Bilo bi zgodno da postoji način za provjeru input datoteka u smislu postojanja duplikata po index-u (timestamp). U slučaju da se pronađe duplikat, on bi trebao automatski biti izbačen iz datoteke, bez obzira da li se podaci poklapaju ili ne - kriterij za određivanje što je duplikat bi trebao biti samo index (timestamp). To vrijedi i za prognozu (wrf) i za mjerenja (obs)
+
+- Kako najbolje riješiti punjenje obs input fileova? Pokretanjem skripte jednom dnevno preko cron-a ili? U slučaju da se riješi brisanje duplikata po index-u, moguće bi bilo i pokretanje punjenja u proizvoljnom terminu tokom dana (za potrebe testiranja na primjer)
+
+- Treba vidjeti što uraditi s podacima koji nedostaju u wrf ili obs fileovima, dakle ako imamo određeni timestamp u jednom fileu ali nema u drugome, idealno bi bilo ignorirati takve unose u procesiranju podataka. Ili? Na primjer sad diff_temp.py kreira NaN podatke kad naleti na takvu situaciju.
+
+- Data sanity checking?? Definicija "outlier-a"? Kriterij za prihvaćanje ili odbacivanje outlier-a?
+
+- Data format checking? Je li potrebno uopće? Npr. ako se pojavi kakav string umjesto float-a u podacima i slično? Ne bi smjelo ali... recimo korumpiran grib ili download mjerenja i slične situacije....
+
