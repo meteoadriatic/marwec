@@ -1,12 +1,14 @@
 import urllib.request
 import xmltodict
 import datetime
-import os
+#import os
 
+'''
 try:
     os.remove('data/input/Maksimir.obs.csv')
 except:
     pass
+'''
 
 for num in range(00, 24):
     num = str(num)
@@ -33,5 +35,5 @@ for num in range(00, 24):
         if location == 'Zagreb-Maksimir':
             print('temperature =', temperature)
             with open("data/input/Maksimir.obs.csv", "a") as myfile:
-                myfile.write(str(int(current_unix_time)) + '\t' + str(temperature) + '\n')
+                myfile.write(str(int(current_unix_time)) + ',' + str(temperature) + '\n')
             break

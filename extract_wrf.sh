@@ -35,7 +35,7 @@ mkdir -p marwec/data/input/tmp
 cd marwec/data/input/tmp
 
 ctlfile=marwec/data/input/wrf_d02.grib2.ctl
-vars="tmp2m u10m v10m dswrad dlwrad uswrad ulwrad rh2m"
+vars="tmp2m td2m u10m v10m dswrad dlwrad uswrad ulwrad"
 for var in $vars ; do
 cat > plotgrads << EOF
 'reinit'
@@ -46,14 +46,14 @@ cat > plotgrads << EOF
 'set gxout print'
 'set undef 0'
 'set prnopts %0.1f 1 1'
-'define tmp2m=(TMP2m)'
+'define tmp2m=TMP2m'
+'define td2m=dpt2m'
 'define u10m=UGRD10m'
 'define v10m=VGRD10m'
 'define dswrad=DSWRFsfc'
 'define dlwrad=DLWRFsfc'
 'define uswrad=USWRFsfc'
 'define ulwrad=ULWRFsfc'
-'define rh2m=RH2m'
 'd $var'
 dummy=write('marwec/data/input/tmp/$var',result)
 'quit'
@@ -73,11 +73,11 @@ for i in {1..24} ; do
 done
 
 
-paste UNIX.list tmp2m u10m v10m dswrad dlwrad uswrad ulwrad rh2m | awk 'BEGIN {print"timestamp\ttmp2m\tu10m\tv10m\tdswrad\tdlwrad\tuswrad\tulwrad\trh2m";}
-            {print $1,"\t",$2,"\t",$3,"\t",$4,"\t",$5,"\t",$6,"\t",$7,"\t",$8,"\t",$9;}
+paste UNIX.list tmp2m td2m u10m v10m dswrad dlwrad uswrad ulwrad | awk 'BEGIN {print"timestamp,tmp2m,td2m,u10m,v10m,dswrad,dlwrad,uswrad,ulwrad";}
+            {print $1,",",$2,",",$3,",",$4,",",$5,",",$6,",",$7,",",$8,",",$9;}
             END{}' > $locname.list
 
-rm tmp2m u10m v10m dswrad dlwrad uswrad ulwrad rh2m
+rm tmp2m td2m u10m v10m dswrad dlwrad uswrad ulwrad
 
 # delete first line, not needed anymore after first run:
 files=*.list
@@ -92,6 +92,9 @@ for file in $files ; do
     sed '$d' $file > $file.tmp
     mv $file.tmp $file
 done
+
+# delete horizontal white spaces
+sed -i 's/[[:blank:]]//g' $locname.list
 
 cat $locname.list >> marwec/data/input/$locname.wrf.csv
 
