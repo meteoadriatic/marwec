@@ -27,10 +27,10 @@ df_wrf = pd.read_csv('data/input/Maksimir.wrf.csv', sep=',', index_col=0)
 df_diff = pd.read_csv('data/input/Maksimir.diff.csv', sep=',', index_col=0)
 
 X_train = np.array(df_wrf)
-# print(X.shape)  # Should return (n1, n2) where n1 = n_samples, n2 = n_features
+# print(X_train.shape)  # Should return (n1, n2) where n1 = n_samples, n2 = n_features
 
 y_train = np.array(df_diff)
-# print(y.shape)  # Should return (m,) where m = n_solutions, and m = n_samples
+# print(y_train.shape)  # Should return (m,) where m = n_solutions, and m = n_samples
 
 
 '''
