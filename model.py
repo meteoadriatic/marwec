@@ -28,17 +28,14 @@ df_diff = pd.read_csv('data/input/Maksimir.diff.csv', sep=',', index_col=0)
 
 df_merged = df_diff.merge(df_wrf, left_index=True, right_index=True)
 
-# print(df_merged)
-# exit()
-
-print(df_merged.ix[:, 0])
+#print(df_merged.ix[:, 0])
 
 y_train = np.array(df_merged.ix[:, 0])
 df_merged.drop(df_merged.columns[[0]], axis=1, inplace=True)
 X_train = np.array(df_merged)
 
-print(X_train.shape)  # Should return (n1, n2) where n1 = n_samples, n2 = n_features
-print(y_train.shape)  # Should return (m,) where m = n_solutions, and m = n_samples
+#print(X_train.shape)  # Should return (n1, n2) where n1 = n_samples, n2 = n_features
+#print(y_train.shape)  # Should return (m,) where m = n_solutions, and m = n_samples
 
 exit()
 '''
