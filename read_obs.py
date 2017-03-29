@@ -2,7 +2,9 @@ import requests as req
 import xmltodict
 import datetime as dt
 import os
+from dateutil import tz
 
+local_tz = tz.gettz('Europe/Zagreb')
 
 STATIONS = ["Zagreb-Maksimir"]
 output_path = "data/input/"
@@ -11,7 +13,7 @@ hours = 24
 
 
 def to_timestamp(dt, epoch=dt.datetime(1970, 1, 1)):
-    td = dt - epoch
+    td = dt - epoch.replace(tzinfo=tz.tzutc())
     return (td.microseconds + (td.seconds + td.days * 86400) * 10 ** 6) / 10 ** 6
 
 
@@ -32,6 +34,7 @@ for hour in range(hours):
     current_time = doc['Hrvatska']['DatumTermin']['Termin']
     current_date_time = current_date + '_' + current_time
     current_date_time = dt.datetime.strptime(current_date_time, "%d.%m.%Y_%H")
+    current_date_time = current_date_time.replace(tzinfo=local_tz)
     current_unix_time = to_timestamp(current_date_time)
     current_unix_time = int(current_unix_time)
     print('date =', current_date, ', time =', current_time, ', timestamp  =', int(current_unix_time))
