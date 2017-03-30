@@ -3,6 +3,7 @@ import xmltodict
 import datetime as dt
 import os
 from dateutil import tz
+import pandas as pd
 
 local_tz = tz.gettz('Europe/Zagreb')
 
@@ -22,6 +23,9 @@ if not os.path.exists(output_path):
     print("Creating directory {}".format(output_path))
     os.makedirs(output_path)
 
+# create empty dataframe
+df = pd.DataFrame(columns=('timestamp', 'tmp2m', 'weather'))
+
 # fetch weather data
 for hour in range(hours):
     url = 'http://vrijeme.hr/tablice/hrvatska_n_{hour:02}.xml'.format(hour=hour)
@@ -40,24 +44,31 @@ for hour in range(hours):
     print('date =', current_date, ', time =', current_time, ', timestamp  =', int(current_unix_time))
 
     dhmz_stations = doc["Hrvatska"]["Grad"]
-    file = output_path + file_name
-    with open(file, "a") as output_file:
-        for station in dhmz_stations:
-            try:
-                if station["GradIme"] in STATIONS:
-                    try:
-                        temperature = float(station["Podatci"]["Temp"])
-                        temperature += 273.15  # convert C to K
-                        temperature = float("{0:.1f}".format(temperature))
-                        print("temperature = {:1}".format(temperature))
-                        if station["@autom"] == "0":
-                            weather_type = str(station["Podatci"]["Vrijeme"])
-                        else:
-                            weather_type = 'NA'
-                        print(weather_type)
-                        output_file.write("{},{:1},{}\n".format(current_unix_time, temperature, weather_type))
-                    except ValueError as e:
-                        print("Couldn't convert value to float: {}, error: {}".format(temperature, e))
-                        continue
-            except KeyError as e:
-                print(str(e))
+    #file = output_path + file_name
+    # with open(file, "a") as output_file:
+    for station in dhmz_stations:
+        try:
+            if station["GradIme"] in STATIONS:
+                try:
+                    temperature = float(station["Podatci"]["Temp"])
+                    temperature += 273.15  # convert C to K
+                    temperature = float("{0:.1f}".format(temperature))
+                    print("temperature = {:1}".format(temperature))
+                    if station["@autom"] == "0":
+                        weather_type = str(station["Podatci"]["Vrijeme"])
+                    else:
+                        weather_type = 'NA'
+                    print(weather_type)
+                    # output_file.write("{},{:1},{}\n".format(current_unix_time, temperature, weather_type))
+                    df = df.append({'timestamp': current_unix_time, 'tmp2m': temperature, 'weather': weather_type}, ignore_index=True)
+                except ValueError as e:
+                    print("Couldn't convert value to float: {}, error: {}".format(temperature, e))
+                    continue
+        except KeyError as e:
+            print(str(e))
+
+df['timestamp'] = df['timestamp'].map(lambda x: '%0.0f' % x)
+df = df.sort_values('timestamp')
+file = output_path + file_name
+with open(file, 'a') as f:
+    df.to_csv(f, header=False, index=False)
