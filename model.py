@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-#from sklearn.preprocessing import OneHotEncoder
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
 
 '''
 1) COLLECTING AND PREPARING DATA
@@ -75,6 +75,9 @@ y_train_weather = np.array(df_merged_weather['weathertype'])
 y_predict_weather = np.array(df_fcst)
 
 
+print('Length of X and y arrays:', len(X_train_temp), len(y_train_temp))
+
+
 # exit()
 '''
 2) PREPROCESSING DATA
@@ -95,11 +98,11 @@ regression model and feed it with our X_train and y_train numpy arrays
 '''
 
 # example: KNeighborsRegression
-kneighbor_regression = KNeighborsRegressor(n_neighbors=3)
+kneighbor_regression = KNeighborsRegressor(n_neighbors=5)
 kneighbor_regression.fit(X_train_temp, y_train_temp)
 
 # example: KNeighborsClassification
-kneighbor_classifier = KNeighborsClassifier(n_neighbors=3)
+kneighbor_classifier = KNeighborsClassifier(n_neighbors=5)
 kneighbor_classifier.fit(X_train_weather, y_train_weather)
 
 
@@ -110,7 +113,23 @@ kneighbor_classifier.fit(X_train_weather, y_train_weather)
 '''
 prediction_temp = kneighbor_regression.predict(y_predict_temp)
 prediction_temp = np.round(prediction_temp, 1)
-prediction_weather = kneighbor_classifier.predict(y_predict_weather)
+prediction_weather_code = kneighbor_classifier.predict(y_predict_weather)
 
+print('----- Results from testing forecast dataset (Maksimir.fcst.csv) -----')
 print('Estimated temperature error =', prediction_temp)
-print('Estimated weather code =', prediction_weather)
+print('Estimated weather code =', prediction_weather_code)
+
+
+'''
+
+5) ACCURACY TESTING
+---------------------------------
+'''
+
+# Regression accuracy testing
+X_train, X_test, y_train, y_test = train_test_split(X_train_temp, y_train_temp, test_size=0.2)
+clf = KNeighborsRegressor(n_neighbors=5)
+clf.fit(X_train, y_train)
+accuracy = clf.score(X_test, y_test)
+print('----- Regression accuracy testing from train_test_split -----')
+print('Accuracy:', accuracy)
