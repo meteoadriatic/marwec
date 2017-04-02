@@ -127,9 +127,23 @@ print('Estimated weather code =', prediction_weather_code)
 '''
 
 # Regression accuracy testing
-X_train, X_test, y_train, y_test = train_test_split(X_train_temp, y_train_temp, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(X_train_temp, y_train_temp, test_size=0.25)
 clf = KNeighborsRegressor(n_neighbors=5)
 clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
 print('----- Regression accuracy testing from train_test_split -----')
 print('Accuracy:', accuracy)
+
+mean_alldata_error = np.sum(abs(y_train_temp)) / len(y_train_temp)
+print('All data mean temperature error:', mean_alldata_error)
+
+mean_testdata_error = np.sum(abs(y_test)) / len(y_test)
+print('Test data mean temperature error:', mean_testdata_error)
+
+forecast_set = clf.predict(X_test)
+mean_forecast_error = np.sum(abs(forecast_set)) / len(forecast_set)
+print('Fcst data mean temperature error:', mean_forecast_error)
+
+fcst_to_test_difference = mean_forecast_error - mean_testdata_error
+print('Mean forecast error - mean test error =', fcst_to_test_difference)
+print('')
