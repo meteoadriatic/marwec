@@ -54,6 +54,8 @@ df_obs.replace('pretežno vedro', 2, inplace=True)
 df_obs.replace('umjereno oblačno', 3, inplace=True)
 df_obs.replace('pretežno oblačno', 4, inplace=True)
 df_obs.replace('potpuno oblačno', 5, inplace=True)
+df_obs.replace('grmljavina s oborinom', 6, inplace=True)
+df_obs.replace('slaba kiša poslije grmlj.', 7, inplace=True)
 # print(df_obs)
 
 df_obs_weather = df_obs['weathertype']
@@ -98,11 +100,11 @@ regression model and feed it with our X_train and y_train numpy arrays
 '''
 
 # example: KNeighborsRegression
-kneighbor_regression = KNeighborsRegressor(n_neighbors=5)
+kneighbor_regression = KNeighborsRegressor(n_neighbors=3)
 kneighbor_regression.fit(X_train_temp, y_train_temp)
 
 # example: KNeighborsClassification
-kneighbor_classifier = KNeighborsClassifier(n_neighbors=5)
+kneighbor_classifier = KNeighborsClassifier(n_neighbors=3)
 kneighbor_classifier.fit(X_train_weather, y_train_weather)
 
 
