@@ -10,6 +10,7 @@ local_tz = tz.gettz('Europe/Zagreb')
 
 STATIONS = ["Zagreb-Maksimir"]
 output_path = "data/input/"
+xml_output_path = "data/input/xml/"
 file_name = "Maksimir.obs.csv"
 hours = 24
 
@@ -24,6 +25,11 @@ if not os.path.exists(output_path):
     print("Creating directory {}".format(output_path))
     os.makedirs(output_path)
 
+# create directory if doesn't exists
+if not os.path.exists(xml_output_path):
+    print("Creating directory {}".format(xml_output_path))
+    os.makedirs(xml_output_path)
+
 # create empty dataframe
 df = pd.DataFrame(columns=('timestamp', 'tmp2m', 'weather'))
 
@@ -33,6 +39,7 @@ for hour in range(hours):
     response = req.get(url)
     response.raise_for_status()
     data = response.content
+
     doc = xmltodict.parse(data)
 
     current_date = doc['Hrvatska']['DatumTermin']['Datum']
@@ -43,6 +50,10 @@ for hour in range(hours):
     current_unix_time = to_timestamp(current_date_time)
     current_unix_time = int(current_unix_time)
     print('date =', current_date, ', time =', current_time, ', timestamp  =', int(current_unix_time))
+
+    xml_filename = "{path}{timestamp}.xml".format(path=xml_output_path, timestamp=current_unix_time)
+    with open(xml_filename, "w") as out_xml:
+        out_xml.write(data)
 
     dhmz_stations = doc["Hrvatska"]["Grad"]
     #file = output_path + file_name
