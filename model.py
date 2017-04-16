@@ -54,8 +54,9 @@ df_obs.replace('pretežno vedro', 2, inplace=True)
 df_obs.replace('umjereno oblačno', 3, inplace=True)
 df_obs.replace('pretežno oblačno', 4, inplace=True)
 df_obs.replace('potpuno oblačno', 5, inplace=True)
-df_obs.replace('grmljavina s oborinom', 6, inplace=True)
-df_obs.replace('slaba kiša poslije grmlj.', 7, inplace=True)
+df_obs.replace('slaba kiša', 6, inplace=True)
+df_obs.replace('grmljavina s oborinom', 7, inplace=True)
+df_obs.replace('slaba kiša poslije grmlj.', 8, inplace=True)
 # print(df_obs)
 
 df_obs_weather = df_obs['weathertype']
@@ -113,13 +114,35 @@ kneighbor_classifier.fit(X_train_weather, y_train_weather)
 ------------------------------
 
 '''
-prediction_temp = kneighbor_regression.predict(y_predict_temp)
-prediction_temp = np.round(prediction_temp, 1)
+prediction_temp_err = kneighbor_regression.predict(y_predict_temp)
+prediction_temp_err = np.round(prediction_temp_err, 1)
 prediction_weather_code = kneighbor_classifier.predict(y_predict_weather)
+wrf_t2m = [i[0] for i in y_predict_temp - 273.15]  # y_predict_temp[0] - 273.15
+# print(wrf_t2m)
+#wrf_t2m = round(wrf_t2m, 1)
+corrected_t2m = wrf_t2m - prediction_temp_err
 
-print('----- Results from testing forecast dataset (Maksimir.fcst.csv) -----')
-print('Estimated temperature error =', prediction_temp)
+print('--- Results from testing forecast dataset (Maksimir.fcst.csv) ---')
+print('Estimated temperature error =', prediction_temp_err)
+print('WRF T2m =', wrf_t2m)
+print('CORRECTED T2m =', corrected_t2m)
 print('Estimated weather code =', prediction_weather_code)
+
+#np.savetxt("data/input/Maksimir_corr_t2m.csv", corrected_t2m, fmt="%.1f", delimiter=",")
+
+df_corr = pd.DataFrame({'timestamp': df_fcst.index.tolist(),
+                        'wrf_t2m': np.round(np.array(wrf_t2m).tolist(), decimals=1),
+                        'prediction_temp_err': prediction_temp_err.tolist(),
+                        'corrected_t2m': np.round(corrected_t2m.tolist(), decimals=1),
+                        'prediction_weather_code': prediction_weather_code.tolist()})
+
+df_corr = df_corr[['timestamp',
+                   'wrf_t2m',
+                   'prediction_temp_err',
+                   'corrected_t2m',
+                   'prediction_weather_code']]
+
+df_corr.to_csv('data/input/Maksimir.corr.csv', index=False)
 
 
 '''
@@ -130,10 +153,10 @@ print('Estimated weather code =', prediction_weather_code)
 
 # Regression accuracy testing
 X_train, X_test, y_train, y_test = train_test_split(X_train_temp, y_train_temp, test_size=0.25)
-clf = KNeighborsRegressor(n_neighbors=5)
+clf = KNeighborsRegressor(n_neighbors=3)
 clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
-print('----- Regression accuracy testing from train_test_split -----')
+print('--- Regression accuracy testing from train_test_split ---')
 print('Accuracy:', accuracy)
 
 mean_alldata_error = np.sum(abs(y_train_temp)) / len(y_train_temp)
